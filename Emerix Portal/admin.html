@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EMERIX — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ─── ROOT ─── */
+:root {
+  --gold:#c9a84c; --gold-light:#e8d48b; --rose:#d4637a; --rose-light:#f0a3b3;
+  --sky:#6baed6; --sky-light:#b3d9ef; --mint:#5cb8a0; --mint-light:#a8e0d2;
+  --dark:#111010; --dark2:#1c1a1b; --dark3:#252220; --card:#1e1c1d;
+  --text:#f0ebe5; --text-dim:rgba(240,235,229,.55);
+  --green:#3aad6e; --red:#e05555; --amber:#d4a030;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Josefin Sans',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ─── TOP BAR ─── */
+.topbar{
+  position:fixed;top:0;left:0;width:100%;z-index:100;
+  background:rgba(17,16,16,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 5%;
+}
+.topbar h1{font-family:'Playfair Display',serif;font-size:22px;letter-spacing:6px;color:var(--gold);text-transform:uppercase}
+.topbar h1 span{color:var(--text-dim);font-size:12px;letter-spacing:2px;display:block;margin-top:2px;font-family:'Josefin Sans',sans-serif;font-weight:300}
+.topbar .export-btn{
+  padding:10px 24px;border:1px solid var(--gold);border-radius:50px;
+  background:transparent;color:var(--gold);font-family:'Josefin Sans',sans-serif;
+  font-size:11px;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:.3s;
+}
+.topbar .export-btn:hover{background:var(--gold);color:var(--dark)}
+
+/* ─── LAYOUT ─── */
+.layout{display:flex;min-height:100vh;padding-top:62px}
+
+/* ─── LEFT SIDEBAR (brand tabs) ─── */
+.sidebar{
+  width:220px;min-width:220px;background:var(--dark2);
+  border-right:1px solid rgba(255,255,255,.06);
+  padding:24px 0;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;
+}
+.sidebar-label{font-size:9px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;padding:0 20px;margin-bottom:10px}
+.brand-tab{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 20px;cursor:pointer;transition:.25s;
+  border-left:3px solid transparent;
+}
+.brand-tab:hover{background:rgba(255,255,255,.04)}
+.brand-tab.active{background:rgba(255,255,255,.07);border-left-color:var(--gold)}
+.brand-tab .dot{width:10px;height:10px;border-radius:50%}
+.brand-tab .tab-info h4{font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.brand-tab .tab-info p{font-size:10px;color:var(--text-dim);margin-top:2px;letter-spacing:.5px}
+.dot-emerix{background:var(--rose)} .dot-luna{background:var(--sky)} .dot-dress{background:var(--mint)}
+
+/* ─── MAIN CONTENT ─── */
+.main{flex:1;padding:32px 4%;overflow-y:auto}
+
+/* ─── UPLOAD FORM CARD ─── */
+.upload-card{
+  background:var(--card);border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;padding:28px;margin-bottom:32px;
+}
+.upload-card h3{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.form-row{display:flex;gap:16px;flex-wrap:wrap}
+.form-group{flex:1;min-width:160px;display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim)}
+.form-group input, .form-group select{
+  background:var(--dark2);border:1px solid rgba(255,255,255,.1);border-radius:10px;
+  padding:11px 14px;color:var(--text);font-family:'Josefin Sans',sans-serif;font-size:13px;
+  outline:none;transition:.25s;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.15)}
+.form-group select option{background:var(--dark2);color:var(--text)}
+
+/* image upload zone */
+.upload-zone{
+  border:2px dashed rgba(255,255,255,.18);border-radius:14px;
+  padding:24px;text-align:center;cursor:pointer;transition:.3s;
+  position:relative;background:var(--dark2);
+}
+.upload-zone:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.upload-zone .uz-icon{font-size:30px;margin-bottom:6px}
+.upload-zone p{font-size:11px;color:var(--text-dim);letter-spacing:1px}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone .preview-thumb{
+  width:80px;height:80px;border-radius:10px;object-fit:cover;
+  margin-top:10px;border:2px solid rgba(255,255,255,.15);
+}
+
+.btn-add{
+  margin-top:18px;padding:11px 32px;background:var(--gold);border:none;border-radius:50px;
+  color:var(--dark);font-family:'Josefin Sans',sans-serif;font-size:12px;
+  letter-spacing:2.5px;text-transform:uppercase;font-weight:600;cursor:pointer;transition:.3s;
+}
+.btn-add:hover{background:var(--gold-light);transform:scale(1.04)}
+
+/* ─── PRODUCT GRID ─── */
+.products-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.products-header h3{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim)}
+.products-header .count{font-size:11px;color:var(--gold);background:rgba(201,168,76,.12);padding:3px 12px;border-radius:50px}
+
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;padding-bottom:40px}
+.product-card{
+  background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;
+  overflow:hidden;transition:.3s;position:relative;
+}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3);border-color:rgba(255,255,255,.14)}
+.product-card .pc-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.product-card .pc-img-placeholder{
+  width:100%;aspect-ratio:3/4;background:var(--dark2);display:flex;align-items:center;justify-content:center;
+  font-size:36px;opacity:.25;
+}
+.product-card .pc-body{padding:14px}
+.product-card .pc-body h4{font-size:13px;letter-spacing:1px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-card .pc-body .pc-price{color:var(--gold);font-size:14px;font-weight:600;letter-spacing:1px}
+.product-card .pc-body .pc-cat{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-top:3px}
+.product-card .pc-delete{
+  position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;
+  background:rgba(224,85,85,.85);border:none;color:#fff;font-size:15px;
+  cursor:pointer;opacity:0;transition:.25s;display:flex;align-items:center;justify-content:center;
+}
+.product-card:hover .pc-delete{opacity:1}
+.product-card .pc-delete:hover{background:var(--red)}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-dim)}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:13px;letter-spacing:1px}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--dark2);border:1px solid rgba(255,255,255,.15);border-radius:12px;
+  padding:12px 24px;font-size:13px;letter-spacing:1px;z-index:999;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:10px;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast .t-dot{width:10px;height:10px;border-radius:50%;background:var(--green)}
+.toast .t-dot.warn{background:var(--amber)} .toast .t-dot.err{background:var(--red)}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--dark)} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:640px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;min-width:0;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:12px;border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}
+  .brand-tab{border-left:none;border-bottom:2px solid transparent;padding:10px 14px}
+  .brand-tab.active{border-bottom-color:var(--gold)}
+  .main{padding:20px 4%}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<div class="topbar">
+  <h1>EMERIX <span>Admin — Product Manager</span></h1>
+  <button class="export-btn" onclick="exportProducts()">⬇ Export Products JSON</button>
+</div>
+
+<!-- ─── LAYOUT ─── -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Brands</div>
+    <div class="brand-tab active" onclick="switchBrand('emerix',this)">
+      <div class="dot dot-emerix"></div>
+      <div class="tab-info"><h4>EMERIX</h4><p>Casual & Lifestyle</p></div>
+    </div>
+    <div class="brand-tab" onclick="switchBrand('luna',this)">
+      <div class="dot dot-luna"></div>
+      <div class="tab-info"><h4>LunaBelle</h4><p>Kids Wear</p></div>
+    </div>
+    <div class="brand-tab" onclick="switchBrand('dress',this)">
+      <div class="dot dot-dress"></div>
+      <div class="tab-info"><h4>Dress Code</h4><p>Office Wear</p></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- UPLOAD FORM -->
+    <div class="upload-card">
+      <h3>+ Add New Product</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="inp-name" placeholder="e.g. Floral Summer Dress"/>
+        </div>
+        <div class="form-group" style="max-width:160px;">
+          <label>Price (LKR)</label>
+          <input type="number" id="inp-price" placeholder="3500"/>
+        </div>
+        <div class="form-group" style="max-width:180px;">
+          <label>Category</label>
+          <select id="inp-category">
+            <option value="women">Women's Wear</option>
+            <option value="men">Men's Wear</option>
+            <option value="street">Street Style</option>
+            <option value="resort">Resort Wear</option>
+            <option value="active">Activewear</option>
+            <option value="kids-girls">Girls Wear</option>
+            <option value="kids-boys">Boys Wear</option>
+            <option value="kids-party">Kids Party</option>
+            <option value="kids-sleep">Sleepwear</option>
+            <option value="suits">Suits & Blazers</option>
+            <option value="shirts">Formal Shirts</option>
+            <option value="office-dress">Work Dresses</option>
+            <option value="office-acc">Office Accessories</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="form-row" style="margin-top:16px;">
+        <div class="form-group" style="max-width:240px;">
+          <label>Product Photo</label>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" accept="image/*" id="inp-image" onchange="previewImage(event)"/>
+            <div class="uz-icon">📷</div>
+            <p>Click or drag image here</p>
+            <img class="preview-thumb" id="preview-thumb" src="" alt="" style="display:none;"/>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-add" onclick="addProduct()">Add Product</button>
+    </div>
+
+    <!-- PRODUCT LIST -->
+    <div class="products-header">
+      <h3 id="grid-title">EMERIX — Products</h3>
+      <span class="count" id="grid-count">0 items</span>
+    </div>
+    <div class="product-grid" id="product-grid">
+      <!-- injected by JS -->
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="t-dot" id="toast-dot"></div><span id="toast-msg">Done</span></div>
+
+<!-- ─── SCRIPT ─── -->
+<script>
+// ─── STATE ───
+let currentBrand = 'emerix';
+const brandNames = { emerix:'EMERIX', luna:'LunaBelle', dress:'Dress Code' };
+const brandSubtitles = { emerix:'Casual & Lifestyle', luna:'Kids Wear', dress:'Office Wear' };
+
+// ─── LOAD from localStorage ───
+function getProducts(brand){ try{ return JSON.parse(localStorage.getItem('emerix_products_'+brand)) || [] }catch(e){ return [] } }
+function saveProducts(brand,arr){ localStorage.setItem('emerix_products_'+brand, JSON.stringify(arr)) }
+
+// ─── SWITCH BRAND TAB ───
+function switchBrand(brand, el){
+  currentBrand = brand;
+  document.querySelectorAll('.brand-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('grid-title').textContent = brandNames[brand]+' — Products';
+  updateCategoryOptions(brand);
+  renderGrid();
+}
+
+function updateCategoryOptions(brand){
+  const sel = document.getElementById('inp-category');
+  const maps = {
+    emerix: [['women','Women\'s Wear'],['men','Men\'s Wear'],['street','Street Style'],['resort','Resort Wear'],['active','Activewear'],['acc','Accessories']],
+    luna:   [['girls','Girls Wear'],['boys','Boys Wear'],['party','Kids Party'],['sleep','Sleepwear'],['toddler','Toddlers']],
+    dress:  [['suits','Suits & Blazers'],['shirts','Formal Shirts'],['trousers','Trousers'],['work-dress','Work Dresses'],['office-acc','Ties & Accessories'],['footwear','Footwear']]
+  };
+  sel.innerHTML = (maps[brand]||[]).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+}
+
+// ─── IMAGE PREVIEW ───
+function previewImage(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById('preview-thumb').src = ev.target.result;
+    document.getElementById('preview-thumb').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── ADD PRODUCT ───
+function addProduct(){
+  const name  = document.getElementById('inp-name').value.trim();
+  const price = document.getElementById('inp-price').value.trim();
+  const cat   = document.getElementById('inp-category').value;
+  const thumb = document.getElementById('preview-thumb');
+  const imgSrc = thumb.src;
+
+  if(!name){ showToast('Please enter a product name','warn'); return; }
+  if(!price){ showToast('Please enter a price','warn'); return; }
+
+  const product = {
+    id: Date.now(),
+    name: name,
+    price: parseFloat(price),
+    category: cat,
+    brand: currentBrand,
+    image: imgSrc || ''   // base64 or empty
+  };
+
+  const products = getProducts(currentBrand);
+  products.push(product);
+  saveProducts(currentBrand, products);
+
+  // reset form
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-price').value = '';
+  document.getElementById('inp-image').value = '';
+  thumb.src = '';
+  thumb.style.display = 'none';
+
+  showToast('Product added successfully ✓','ok');
+  renderGrid();
+}
+
+// ─── DELETE PRODUCT ───
+function deleteProduct(id){
+  let products = getProducts(currentBrand);
+  products = products.filter(p => p.id !== id);
+  saveProducts(currentBrand, products);
+  showToast('Product deleted','warn');
+  renderGrid();
+}
+
+// ─── RENDER GRID ───
+function renderGrid(){
+  const products = getProducts(currentBrand);
+  const grid = document.getElementById('product-grid');
+  document.getElementById('grid-count').textContent = products.length + ' item' + (products.length===1?'':'s');
+
+  if(products.length === 0){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="es-icon">📦</div><p>No products yet. Add your first product above!</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map(p => `
+    <div class="product-card">
+      <button class="pc-delete" onclick="deleteProduct(${p.id})">×</button>
+      ${p.image ? `<img class="pc-img" src="${p.image}" alt="${p.name}"/>` : `<div class="pc-img-placeholder">👗</div>`}
+      <div class="pc-body">
+        <h4>${p.name}</h4>
+        <div class="pc-price">LKR ${p.price.toLocaleString()}</div>
+        <div class="pc-cat">${p.category}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── EXPORT ALL PRODUCTS as JSON file ───
+function exportProducts(){
+  const all = {
+    emerix: getProducts('emerix'),
+    luna:   getProducts('luna'),
+    dress:  getProducts('dress')
+  };
+  const blob = new Blob([JSON.stringify(all,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'emerix_products.json';
+  a.click();
+  showToast('JSON file exported! Place it next to emerix.html','ok');
+}
+
+// ─── TOAST ───
+function showToast(msg, type){
+  document.getElementById('toast-msg').textContent = msg;
+  const dot = document.getElementById('toast-dot');
+  dot.className = 't-dot' + (type==='warn'?' warn':type==='err'?' err':'');
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(()=> toast.classList.remove('show'), 2600);
+}
+
+// ─── INIT ───
+updateCategoryOptions('emerix');
+renderGrid();
+</script>
+</body>
+</html>
